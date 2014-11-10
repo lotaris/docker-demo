@@ -1,0 +1,16 @@
+- hosts: localhost
+
+  vars:
+    redis_user: redis
+    redis_uid: 4200
+    redis_group: redis
+
+  tasks:
+    - name: Add redis group
+      group: name={{ redis_group }} state=present
+
+    - name: Create redis user
+      user: name={{ redis_user }} group={{ redis_group }} uid={{ redis_uid }} state=present
+
+    - name: Create the directory data
+      file: path=/data owner={{ redis_user }} group={{ redis_group }} state=directory

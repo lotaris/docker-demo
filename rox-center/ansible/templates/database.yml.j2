@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: 5
+
+development:
+  <<: *default
+  database: rox-center
+
+test:
+  <<: *default
+  database: rox-center-test
+
+production:
+  <<: *default
+  host: {{ postgres_host }}
+  port: {{ postgres_port }}
+  database: {{ postgres_db }}
+  username: {{ postgres_user }}
+  password: {{ postgres_pass }}

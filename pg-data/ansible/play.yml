@@ -1,0 +1,16 @@
+- hosts: localhost
+
+  vars:
+    postgres_user: postgres
+    postgres_uid: 4201
+    postgres_group: postgres
+
+  tasks:
+    - name: Add postgres group
+      group: name={{ postgres_group }} state=present
+
+    - name: Create postgres user
+      user: name={{ postgres_user }} group={{ postgres_group }} uid={{ postgres_uid }} state=present
+
+    - name: Create the directory data
+      file: path=/data owner={{ postgres_user }} group={{ postgres_group }} state=directory

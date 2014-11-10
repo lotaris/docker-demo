@@ -1,0 +1,23 @@
+bash image ID: e9782bf22919
+
+# Prepare the data container for Redis
+redis-data image ID: c4e35b2ee6dd
+redis-data run cmd: docker run -v /data --name redis-data <ID>
+redis-data bash run cmd: docker run -ti --volumes-from redis-data <ID_BASH>
+
+# Start the Redis server
+redis-srv image ID: c7d548eda9b6
+redis-srv run cmd: docker run -dP --volumes-from redis-data --name redis-srv <ID>
+
+# Prepare the data container for Postgres
+pg-data image ID: 2543dae83e14
+pg-data run cmd: docker run -v /data --name pg-data <ID>
+pg-data bash run cmd: docker run -ti --volumes-from pg-data <ID_BASH>
+
+# Initialize the data container for Postgres
+pg-init image ID: f7999d970c3f
+pg-init run cmd: docker run --volumes-from pg-data <ID>
+
+# Start the Postgres server
+pg-srv image ID: 76c69b9c93c3
+pg-srv run cmd: docker run -dP --volumes-from pg-data --name pg-srv <ID>

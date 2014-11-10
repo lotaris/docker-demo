@@ -1,0 +1,26 @@
+- hosts: localhost
+
+  tasks:
+    - name: Initialize postgresql
+      command: /bin/su postgres -c 'initdb -D /data -E UTF8 --locale=en_US.UTF8'
+
+    - name: Enabled listening address
+      command: sed -ri "s/^#(listen_addresses\s*=\s*)\S+/\1'*'/" /data/postgresql.conf
+
+    - name: Add all host to be able to connect postgres
+      shell: "{ echo; echo 'host all all 0.0.0.0/0 trust'; } >> /data/pg_hba.conf"
+
+    - name: Start postgresql
+      command: /bin/su postgres -c 'pg_ctl start -D /data -l /data/postgresql.log -w'
+
+    - name: Install dependency to create user and db
+      yum: name=python-psycopg2 state=present
+
+    - name: Create rox-center user
+      postgresql_user: name=rox-center
+
+    - name: Create rox-center database
+      postgresql_db: name=rox-center owner=rox-center
+
+    - name: Stop postgres
+      command: /bin/su postgres -c 'pg_ctl stop -D /data -l /data/postgresql.log -w'
