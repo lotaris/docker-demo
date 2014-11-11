@@ -26,7 +26,12 @@ pg-srv run cmd: docker run -dP --volumes-from pg-data --name pg-srv <ID>
 # ROX Center Commander
 rox-center-commander image ID: 709068cc939e
 rox-center-commander load schema: docker run --link /pg-srv:pg-srv --link /redis-srv:redis-srv <ID> "RAILS_ENV=production bundle exec rake db:schema:load"
+rox-center-commander create user: docker run --link /pg-srv:pg-srv --link /redis-srv:redis-srv <ID> "RAILS_ENV=production bundle exec rake users:register[laurent.prevost@lotaris.com,Operate123]"
 
 # ROX Center rails app
 rox-center image ID: 3ae6316b76e2
 rox-center run cmd: docker run -dP --link pg-srv:pg-srv --link redis-srv:redis-srv --name rox-center <ID>
+
+# Nginx Proxy
+nginx image ID: b6c6132fd7f2
+nginx run cmd: docker run -dP --link /rox-center:rox-center --volumes-from rox-center --name nginx <ID>

@@ -1,0 +1,25 @@
+- hosts: localhost
+
+  vars:
+    nginx_uid: 4203
+    nginx_user: nginx
+    nginx_group: nginx
+
+    application_path: /rox
+    application_host: rox-center
+    application_port: 3000
+
+  tasks:
+    - name: Add nginx group
+      group: name={{ nginx_group }} state=present
+
+    - name: Create nginx user
+      user: name={{ nginx_user }} group={{ nginx_group }} uid={{ nginx_uid }} state=present
+
+    - name: Install Dependencies
+      yum: name={{ item }} state=present
+      with_items:
+        - nginx
+
+    - name: Copy configuration file
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/nginx.conf
