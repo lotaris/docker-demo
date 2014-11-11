@@ -1,0 +1,44 @@
+- hosts: localhost
+
+  vars:
+    unicorn_uid: 4202
+    unicorn_user: unicorn
+    unicorn_group: unicorn
+
+    ruby_version: "2.1.4"
+
+  tasks:
+    - name: Add unicorn group
+      group: name={{ unicorn_group }} state=present
+
+    - name: Create unicorn user
+      user: name={{ unicorn_user }} group={{ unicorn_group }} uid={{ unicorn_uid }} state=present
+
+    - name: Install Dependencies
+      yum: name={{ item }} state=present
+      with_items:
+        - tar
+        - gcc
+        - make
+        - openssl-devel
+        - libyaml-devel
+        - readline-devel
+        - zlib-devel
+        - gcc-c++
+        - postgresql-devel
+        - nodejs
+
+    - name: Clone rbenv
+      shell: /bin/su {{ unicorn_user }} -c "git clone https://github.com/sstephenson/rbenv.git ~/.rbenv" creates=~/.rbenv
+
+    - name: Setup bash profile
+      script: scripts/rbenv.sh {{ unicorn_user }}
+
+    - name: Add ruby-build as plugin to rbenv
+      shell: /bin/su {{ unicorn_user }} -c "git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build" creates=~/.rbenv/plugins/ruby-build
+
+    - name: Install Ruby
+      shell: /bin/su {{ unicorn_user }} -l -c "rbenv install {{ ruby_version }}" creates=/home/{{ unicorn_user }}/.rbenv/shims
+
+    - name: Install bundler
+      shell: /bin/su {{ unicorn_user }} -l -c "RBENV_VERSION={{ ruby_version }} /home/{{ unicorn_user }}/.rbenv/shims/gem install bundler"

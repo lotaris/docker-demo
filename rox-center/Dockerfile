@@ -1,9 +1,9 @@
-FROM ansible/centos7-ansible:stable
-
-COPY rox-center/ /rox
+FROM d080829c2fb8
 
 ADD ansible /ansible/
 WORKDIR /ansible
+
+COPY rox-center /rox
 
 RUN ansible-playbook play.yml -c local
 
@@ -14,5 +14,4 @@ EXPOSE 3000
 VOLUME /rox
 WORKDIR /rox
 
-#ENTRYPOINT ["/bin/su", "unicorn", "-c", "RAILS_ENV=production bundle exec unicorn_rails -c config/unicorn.rb -E production -D"]
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "-l", "-c", "RAILS_ENV=production bundle exec unicorn_rails -c config/unicorn.rb -E production"]

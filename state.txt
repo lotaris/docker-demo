@@ -1,4 +1,5 @@
 bash image ID: e9782bf22919
+unicorn-rbenv image ID: d080829c2fb8
 
 # Prepare the data container for Redis
 redis-data image ID: c4e35b2ee6dd
@@ -21,3 +22,11 @@ pg-init run cmd: docker run --volumes-from pg-data <ID>
 # Start the Postgres server
 pg-srv image ID: 76c69b9c93c3
 pg-srv run cmd: docker run -dP --volumes-from pg-data --name pg-srv <ID>
+
+# ROX Center Commander
+rox-center-commander image ID: 709068cc939e
+rox-center-commander load schema: docker run --link /pg-srv:pg-srv --link /redis-srv:redis-srv <ID> "RAILS_ENV=production bundle exec rake db:schema:load"
+
+# ROX Center rails app
+rox-center image ID: 3ae6316b76e2
+rox-center run cmd: docker run -dP --link pg-srv:pg-srv --link redis-srv:redis-srv --name rox-center <ID>

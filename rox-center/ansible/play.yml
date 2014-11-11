@@ -2,59 +2,25 @@
 
   vars:
     application_path: /rox
+    application_version: angular
     application_secret_key_base: 6d3cbf5065a5039611b50e00e3fb3cd97e6dbefd7aedbd2707be2e29f9a056f46153915d7c8d9cddf6ea6aeefa0f507a53e1faa82e2440b48b9fbfaa0e4da615
 
-    unicorn_user: unicorn
     unicorn_uid: 4202
+    unicorn_user: unicorn
     unicorn_group: unicorn
 
-    postgres_host: pg-srv
     postgres_port: 5432
+    postgres_host: pg-srv
     postgres_user: rox-center
     postgres_pass: rox-center
     postgres_db: rox-center
 
-    redis_host: redis-srv
     redis_port: 6379
+    redis_host: redis-srv
 
   tasks:
-    - name: Add unicorn group
-      group: name={{ unicorn_group }} state=present
-
-    - name: Create unicorn user
-      user: name={{ unicorn_user }} group={{ unicorn_group }} uid={{ unicorn_uid }} state=present
-
     - name: Change rights to the ROX directory
       file: path={{ application_path }} owner={{ unicorn_user }} group={{ unicorn_group }} recurse=yes state=directory
-
-    - name: Install Dependencies
-      yum: name={{ item }} state=present
-      with_items:
-        - tar
-        - gcc
-        - make
-        - openssl-devel
-        - libyaml-devel
-        - readline-devel
-        - zlib-devel
-        - gcc-c++
-        - postgresql-devel
-        - nodejs
-
-    - name: Clone rbenv
-      shell: /bin/su {{ unicorn_user }} -c "git clone https://github.com/sstephenson/rbenv.git ~/.rbenv" creates=~/.rbenv
-
-    - name: Setup bash profile
-      script: scripts/rbenv.sh {{ unicorn_user }}
-
-    - name: Add ruby-build as plugin to rbenv
-      shell: /bin/su {{ unicorn_user }} -c "git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build" creates=~/.rbenv/plugins/ruby-build
-
-    - name: Install Ruby
-      shell: /bin/su {{ unicorn_user }} -l -c "cd {{ application_path }} && rbenv install" creates=/home/{{ unicorn_user }}/.rbenv/shims
-
-    - name: Install bundler
-      shell: /bin/su {{ unicorn_user }} -l -c "cd {{ application_path }} && /home/{{ unicorn_user }}/.rbenv/shims/gem install bundler"
 
     - name: Copy configuration files
       template: src=templates/{{ item }}.j2 dest={{ application_path }}/config/{{ item }} owner={{ unicorn_user }} group={{ unicorn_group }}
