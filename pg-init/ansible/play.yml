@@ -1,5 +1,10 @@
 - hosts: localhost
 
+  vars:
+    application_db_user: rox-center
+    application_db_pass: rox-center
+    application_db_name: rox-center
+
   tasks:
     - name: Initialize postgresql
       command: /bin/su postgres -c 'initdb -D /data -E UTF8 --locale=en_US.UTF8'
@@ -17,10 +22,10 @@
       yum: name=python-psycopg2 state=present
 
     - name: Create rox-center user
-      postgresql_user: name=rox-center
+      postgresql_user: name={{ application_db_user }}
 
     - name: Create rox-center database
-      postgresql_db: name=rox-center owner=rox-center
+      postgresql_db: name={{ application_db_name }} owner={{ application_db_user }}
 
     - name: Stop postgres
       command: /bin/su postgres -c 'pg_ctl stop -D /data -l /data/postgresql.log -w'
