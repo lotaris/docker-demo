@@ -1,0 +1,16 @@
+- hosts: localhost
+
+  vars:
+    mysql_uid: 4203
+    mysql_user: mysql
+    mysql_group: mysql
+
+  tasks:
+    - name: Add mysql group
+      group: name={{ mysql_group }} state=present
+
+    - name: Create mysql user
+      user: name={{ mysql_user }} group={{ mysql_group }} uid={{ mysql_uid }} state=present
+
+    - name: Create the directory data
+      file: path=/data owner={{ mysql_user }} group={{ mysql_group }} state=directory

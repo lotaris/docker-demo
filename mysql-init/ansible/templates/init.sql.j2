@@ -1,0 +1,19 @@
+
+DELETE FROM mysql.user ;
+
+CREATE USER 'root'@'%' IDENTIFIED BY '{{ mysql_root_password }}' ;
+GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;
+
+DROP DATABASE IF EXISTS test ;
+
+CREATE USER '{{ backend_demoapp_db_user }}'@'%' IDENTIFIED BY '{{ backend_demoapp_db_pass }}';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER,
+  CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW,
+  CREATE ROUTINE, ALTER ROUTINE, EXECUTE, LOCK TABLES ON *.* TO 'LotarisDBUser'@'%'
+  IDENTIFIED BY '{{ backend_demoapp_db_pass }}' WITH MAX_QUERIES_PER_HOUR 0
+  MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
+GRANT ALL PRIVILEGES ON `{{ backend_demoapp_db_name }}`.* TO '{{ backend_demoapp_db_user }}'@'%';
+
+CREATE DATABASE {{ backend_demoapp_db_name }};
+
+FLUSH PRIVILEGES ;

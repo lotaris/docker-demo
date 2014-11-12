@@ -1,0 +1,27 @@
+- hosts: localhost
+
+  vars:
+    mysql_uid: 4203
+    mysql_user: mysql
+    mysql_group: mysql
+
+    data_path: /data
+
+  tasks:
+    - name: Add mysql group
+      group: name={{ mysql_group }} state=present
+
+    - name: Create mysql user
+      user: name={{ mysql_user }} group={{ mysql_group }} uid={{ mysql_uid }} state=present
+
+    - name: Prepare the yum repository
+      template: src=templates/mysql-community.repo.j2 dest=/etc/yum.repos.d/mysql-community.repo
+
+    - name: Enable mysql yum repository
+      command: yum repolist enabled
+
+    - name: Install MySQL
+      yum: name=mysql-community-server state=present
+
+    - name: Copy configuration file
+      template: src=templates/my.cnf.j2 dest=/etc/my.cnf

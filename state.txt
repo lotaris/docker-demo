@@ -40,3 +40,16 @@ resque run cmd: docker run -d --link /pg-srv:pg-srv --link /redis-srv:redis-srv 
 # Nginx Proxy
 nginx image ID: b6c6132fd7f2
 nginx run cmd: docker run -dP --link /rox-center:rox-center --volumes-from rox-center --name nginx <ID>
+
+# Prepare the data container for MySQL
+mysql-data image ID: d47ffe07cd2c
+mysql-data run cmd: docker run -v /data --name mysql-data <ID>
+mysql-data bash run cmd: docker run -ti --volumes-from mysql-data <ID_BASH>
+
+# Initialize MySQL
+mysql-init image ID: 17f8515a91a3
+mysql-init run cmd: docker run --volumes-from mysql-data <ID>
+
+# MySQL Server
+mysql-srv image ID: a9e6308c53ec
+mysql-srv run cmd: docker run -dP --volumes-from mysql-data --name mysql-srv <ID>
