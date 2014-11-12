@@ -1,4 +1,4 @@
-FROM 3ae6316b76e2
+FROM d6add50ad23c
 
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 
