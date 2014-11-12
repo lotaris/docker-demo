@@ -1,5 +1,6 @@
 bash image ID: e9782bf22919
 unicorn-rbenv image ID: b4d424e86e91
+java image ID: 4f57b7725276
 
 # Prepare the data container for Redis
 redis-data image ID: c4e35b2ee6dd
@@ -53,3 +54,7 @@ mysql-init run cmd: docker run --volumes-from mysql-data <ID>
 # MySQL Server
 mysql-srv image ID: a9e6308c53ec
 mysql-srv run cmd: docker run -dP --volumes-from mysql-data --name mysql-srv <ID>
+
+# Glassfish server
+glassfish-srv image ID: abeda8831ecd
+glassfish-srv run cmd: docker run -dP --link /mysql-srv:mysql-srv --name gf-srv <ID>
