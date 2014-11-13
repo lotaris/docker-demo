@@ -5,4 +5,4 @@
       yum: name=wget state=present
 
     - name: Install Java
-      yum: name=java-1.7.0-openjdk state=present
+      yum: name=java-1.7.0-openjdk-devel state=present

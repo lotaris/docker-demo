@@ -74,7 +74,7 @@
       command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} --user admin --passwordfile {{ asadmin_password_file }} --host localhost --port 4848 enable-secure-admin"
 
     - name: Add connection pool
-      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} --user admin --passwordfile {{ asadmin_password_file }} --host localhost --port 4848 create-jdbc-connection-pool --datasourceclassname com.mysql.jdbc.jdbc2.optional.MysqlXADataSource --steadypoolsize 5 --maxpoolsize 50 --maxwait 60000 --idletimeout 300 --isconnectvalidatereq=true --validationmethod meta-data --restype javax.sql.XADataSource --property DatabaseName={{ backend_demoapp_db_name }}:ServerName={{ mysql_host }}:port={{ mysql_port }}:password={{ backend_demoapp_db_pass }}:user={{ backend_demoapp_db_user }} demo-back-pool"
+      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} --user admin --passwordfile {{ asadmin_password_file }} --host localhost --port 4848 create-jdbc-connection-pool --datasourceclassname com.mysql.jdbc.jdbc2.optional.MysqlXADataSource --steadypoolsize 5 --maxpoolsize 50 --maxwait 60000 --idletimeout 300 --isconnectvalidatereq=true --validationmethod meta-data --restype javax.sql.XADataSource --property DatabaseName={{ backend_demoapp_db_name }}:ServerName={{ mysql_host }}:port={{ mysql_port }}:password={{ backend_demoapp_db_pass }}:user={{ backend_demoapp_db_user }} todo-list-pool"
 
     - name: Add JDBC resource
-      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} --user admin --passwordfile {{ asadmin_password_file }} --host localhost --port 4848 create-jdbc-resource --enabled=true --connectionpoolid demo-back-pool jdbc/demo-back"
+      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} --user admin --passwordfile {{ asadmin_password_file }} --host localhost --port 4848 create-jdbc-resource --enabled=true --connectionpoolid todo-list-pool jdbc/TodoList"
