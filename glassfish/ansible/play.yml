@@ -19,12 +19,26 @@
     mysql_host: mysql-srv
     mysql_port: 3306
 
+    download_directory: /tmp/dl
+
   tasks:
     - name: Install yum packages
       yum: name={{ item }} state=present
       with_items:
         - unzip
         - expect
+
+    - name: Create download directory in temp file
+      file: path={{ download_directory }} state=directory
+
+    - name: Download glassfish
+      command: wget -O {{ download_directory }}/glassfish-4.1.zip http://dlc.sun.com.edgesuite.net/glassfish/4.1/release/glassfish-4.1.zip
+
+    - name: Dowload mysql connector
+      command: wget -O {{ download_directory }}/mysql-connector-java-5.1.34.zip http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.34.zip
+
+    - name: Unzip mysql connector
+      unarchive: src={{ download_directory }}/mysql-connector-java-5.1.34.zip dest={{ download_directory }}
 
     - name: Add glassfish group
       group: name={{ glassfish_group }} state=present
@@ -33,10 +47,13 @@
       user: name={{ glassfish_user }} group={{ glassfish_group }} uid={{ glassfish_uid }} state=present
 
     - name: Install glassfish
-      unarchive: src=files/glassfish-4.1.zip dest=/ copy=yes group={{ glassfish_group }} owner={{ glassfish_user }} creates=/glassfish4
+      unarchive: src={{ download_directory }}/glassfish-4.1.zip dest=/ copy=yes group={{ glassfish_group }} owner={{ glassfish_user }} creates=/glassfish4
 
     - name: Install mysql connector
-      copy: src=files/mysql-connector-java-5.1.34-bin.jar dest={{ glassfish_home }}/lib group={{ glassfish_group }} owner={{ glassfish_user }}
+      copy: src={{ download_directory }}/mysql-connector-java-5.1.34/mysql-connector-java-5.1.34-bin.jar dest={{ glassfish_home }}/lib group={{ glassfish_group }} owner={{ glassfish_user }}
+
+    - name: Clean the download directory
+      file: path={{ download_directory }} state=absent
 
     - name: Copy the the password file for glassfish
       template: src=templates/PASSWORD_FILE.j2 dest={{ asadmin_password_file }} group={{ glassfish_group }} owner={{ glassfish_user }}
