@@ -58,3 +58,7 @@ mysql-srv run cmd: docker run -dP --volumes-from mysql-data --name mysql-srv <ID
 # Glassfish server
 glassfish-srv image ID: 8301fdce6c3d
 glassfish-srv run cmd: docker run -dP --link /mysql-srv:mysql-srv --name gf-srv <ID>
+
+# Jenkins server
+jenkins-srv images ID: fb328556e100
+jenkins-srv run cmd: docker run -dP --name jenkins-srv <ID>
