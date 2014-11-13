@@ -77,4 +77,4 @@ sonarqube-mysql-srv run cmd: docker run -dP --volumes-from sonar-mysql-data --na
 
 # Sonar Qube server
 sonarqube-srv image ID: f6aa866c6827
-sonarqube-srv run cmd: docker run -dP --link /sonar-mysql-srv:sonar-mysql-srv <ID>
+sonarqube-srv run cmd: docker run -dP --link /sonar-mysql-srv:sonar-mysql-srv --name sonar-srv <ID>
