@@ -80,3 +80,6 @@
       template: src=templates/{{ item }}.xml.j2 dest=/var/lib/jenkins/jobs/{{ item }}/config.xml group={{ jenkins_group }} owner={{ jenkins_user }}
       with_items:
         - deploy-todo-list-backend
+
+    - name: Clean the download directory
+      file: path={{ download_directory }} state=absent
