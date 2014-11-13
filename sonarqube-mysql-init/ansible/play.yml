@@ -1,0 +1,29 @@
+- hosts: localhost
+
+  vars:
+    mysql_user: mysql
+    mysql_group: mysql
+
+    mysql_root_password: Operate123
+
+    data_path: /data
+
+    sonar_db_user: sonar
+    sonar_db_pass: sonar
+    sonar_db_name: sonar
+
+  tasks:
+    - name: Copy configuration file
+      template: src=templates/my.cnf.j2 dest=/etc/my.cnf
+
+    - name: Install default database
+      command: mysql_install_db --user={{ mysql_user }} --datadir={{ data_path }}
+
+    - name: Copy configuration file
+      template: src=templates/init.sql.j2 dest=/data/init.sql
+
+    - name: Start mysqld to setup the user and database
+      service: name=mysqld state=started
+
+    - name: Stop mysqld
+      service: name=mysqld state=stopped

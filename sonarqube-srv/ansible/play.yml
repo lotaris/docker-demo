@@ -1,0 +1,44 @@
+- hosts: localhost
+
+  vars:
+    sonar_uid: 4206
+    sonar_user: sonar
+    sonar_group: sonar
+
+    sonar_mysql_host: sonar-mysql-srv
+    sonar_mysql_port: 3306
+    sonar_mysql_db: sonar
+    sonar_mysql_user: sonar
+    sonar_mysql_pass: sonar
+
+    download_directory: /tmp/dl
+
+  tasks:
+    - name: Add sonar group
+      group: name={{ sonar_group }} state=present
+
+    - name: Create sonar user
+      user: name={{ sonar_user }} group={{ sonar_group }} uid={{ sonar_uid }} state=present
+
+    - name: Create download directory in temp file
+      file: path={{ download_directory }} state=directory
+
+    - name: Install yum packages
+      yum: name={{ item }} state=present
+      with_items:
+        - unzip
+
+    - name: Download sonar
+      command: wget -O {{ download_directory }}/sonarqube-4.5.1.zip http://dist.sonar.codehaus.org/sonarqube-4.5.1.zip
+
+    - name: Install sonar
+      unarchive: src={{ download_directory }}/sonarqube-4.5.1.zip dest=/ creates=/sonarqube
+
+    - name: Copy the sonar configuration file
+      template: src=templates/sonar.properties.j2 dest=/sonarqube-4.5.1/conf/sonar.properties
+
+    - name: Apply the correct rights to sonar
+      file: path=/sonarqube-4.5.1 group={{ sonar_group }} owner={{ sonar_user }} recurse=yes state=directory
+
+    - name: Clean the download directory
+      file: path={{ download_directory }} state=absent

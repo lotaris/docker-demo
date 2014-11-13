@@ -62,3 +62,19 @@ glassfish-srv run cmd: docker run -dP --link /mysql-srv:mysql-srv --name gf-srv 
 # Jenkins server
 jenkins-srv images ID: fb328556e100
 jenkins-srv run cmd: docker run -dP --name jenkins-srv <ID>
+
+# Prepare the data container for Sonar MySQL
+sonarqube-mysql-data image ID: d47ffe07cd2c
+sonarqube-mysql-data run cmd: docker run -v /data --name sonar-mysql-data <ID>
+sonarqube-mysql-data bash run cmd: docker run -ti --volumes-from sonar-mysql-data <ID_BASH>
+
+# Initialize Sonar MySQL
+sonarqube-mysql-init image ID: 5baa04767eee
+sonarqube-mysql-init run cmd: docker run --volumes-from sonar-mysql-data <ID>
+
+# Sonar MySQL Server (exactly the same as MySQL itself)
+sonarqube-mysql-srv run cmd: docker run -dP --volumes-from sonar-mysql-data --name sonar-mysql-srv <ID>
+
+# Sonar Qube server
+sonarqube-srv image ID: f6aa866c6827
+sonarqube-srv run cmd: docker run -dP --link /sonar-mysql-srv:sonar-mysql-srv <ID>
