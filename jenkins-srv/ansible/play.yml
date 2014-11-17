@@ -1,58 +1,20 @@
 - hosts: localhost
 
   vars:
-    jenkins_uid: 4205
     jenkins_user: jenkins
     jenkins_group: jenkins
 
-    jenkins_root: /jenkins
-
     download_directory: /tmp/dl
 
-  tasks:
-    - name: Add jenkins group
-      group: name={{ jenkins_group }} state=present
+    mysql_user: todolist
+    mysql_pass: todolist
 
-    - name: Create jenkins user
-      user: name={{ jenkins_user }} group={{ jenkins_group }} uid={{ jenkins_uid }} state=present
+  tasks:
+    - name: Start Jenkins
+      service: name=jenkins state=started
 
     - name: Create download directory in temp file
       file: path={{ download_directory }} state=directory
-
-    - name: Install yum packages
-      yum: name={{ item }} state=present
-      with_items:
-        - tar
-
-    - name: Download maven
-      command: wget -O {{ download_directory }}/apache-maven-3.0.5-bin.tar.gz http://mirrors.gigenet.com/apache/maven/maven-3/3.0.5/binaries/apache-maven-3.0.5-bin.tar.gz
-
-    - name: Install maven
-      unarchive: src={{ download_directory }}/apache-maven-3.0.5-bin.tar.gz dest=/ creates=/apache-maven-3.0.5
-
-    - name: Install the jenkins repos
-      command: wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
-
-    - name: Install the jenkins repos keys
-      command: rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
-
-    - name: Install Jenkins
-      yum: name=jenkins state=present
-
-    - name: Download the jenkins update center file
-      command: wget -O {{ download_directory }}/default.js http://updates.jenkins-ci.org/update-center.json
-
-    - name: Create the jenkins updates directory
-      file: path=/var/lib/jenkins/updates group={{ jenkins_group }} owner={{ jenkins_user }} state=directory
-
-    - name: Prepare the jenkins update center file
-      shell: sed '1d;$d' {{ download_directory}}/default.js > /var/lib/jenkins/updates/default.json
-
-    - name: Set the correct rights on the jenkins update center file
-      file: path=/var/lib/jenkins/updates/default.json group={{ jenkins_group }} owner={{ jenkins_user }} state=file
-
-    - name: Start Jenkins
-      service: name=jenkins state=started
 
     - name: Do a break to let Jenkins to be ready
       pause: seconds=30
@@ -60,26 +22,24 @@
     - name: Download jenkins client
       command: wget -O {{ download_directory }}/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
 
-    - name: Install jenkins plugins
-      command: java -jar {{ download_directory }}/jenkins-cli.jar -s http://localhost:8080 install-plugin {{ item }}
-      with_items:
-        - git
+    - name: Create temp jobs directory
+      file: path={{ download_directory }}/jobs state=directory
 
-    - name: Configure Jenkins
-      template: src=templates/{{ item }}.j2 dest=/var/lib/jenkins/{{ item }} group={{ jenkins_group }} owner={{ jenkins_user }}
-      with_items:
-        - config.xml
-        - hudson.tasks.Maven.xml
-
-    - name: Create job directories
-      file: path=/var/lib/jenkins/jobs/{{ item }} group={{ jenkins_group }} owner={{ jenkins_user }} state=directory
+    - name: Copy the jobs
+      template: src=templates/{{ item }}.xml.j2 dest={{ download_directory }}/jobs/{{ item }}.xml
       with_items:
         - deploy-todo-list-backend
 
     - name: Install the jobs
-      template: src=templates/{{ item }}.xml.j2 dest=/var/lib/jenkins/jobs/{{ item }}/config.xml group={{ jenkins_group }} owner={{ jenkins_user }}
+      shell: java -jar {{ download_directory }}/jenkins-cli.jar -s http://localhost:8080 create-job {{ item }} < {{ download_directory }}/jobs/{{ item }}.xml
       with_items:
         - deploy-todo-list-backend
+
+    - name: Create maven user directory
+      file: path=/home/{{ jenkins_user }}/.m2 group={{ jenkins_group }} owner={{ jenkins_user }} state=directory
+
+    - name: Install the maven settings bootstrap configuration file
+      template: src=templates/msb.yml.j2 dest=/home/{{ jenkins_user }}/.m2/msb.yml group={{ jenkins_group }} owner={{ jenkins_user }}
 
     - name: Clean the download directory
       file: path={{ download_directory }} state=absent

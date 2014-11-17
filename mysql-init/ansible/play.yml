@@ -8,9 +8,9 @@
 
     data_path: /data
 
-    backend_demoapp_db_user: demo-back
-    backend_demoapp_db_pass: demo-back
-    backend_demoapp_db_name: demo_back
+    backend_demoapp_db_user: todolist
+    backend_demoapp_db_pass: todolist
+    backend_demoapp_db_name: TODOLIST
 
   tasks:
     - name: Copy configuration file

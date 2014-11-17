@@ -5,6 +5,4 @@ WORKDIR /ansible
 
 RUN ansible-playbook play.yml -c local
 
-USER glassfish
-
-ENTRYPOINT ["/glassfish4/glassfish/bin/asadmin", "start-domain", "-w", "domain1"]
+VOLUME /var/lib/jenkins
