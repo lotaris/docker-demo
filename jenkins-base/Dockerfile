@@ -1,4 +1,4 @@
-FROM 119c39cd7419
+FROM 63f27e1fc274
 
 ADD ansible /ansible
 WORKDIR /ansible

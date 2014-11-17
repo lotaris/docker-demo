@@ -5,7 +5,7 @@
 * bash image ID: `e9782bf22919`
 * unicorn-rbenv image ID: `b4d424e86e91`
 * java image ID: `3ad17156d715`
-* glassfish base image ID: `119c39cd7419`
+* glassfish base image ID: `63f27e1fc274`
 * jenkins base image ID: `eb88272d9982`
 
 # Prepare the data container for Redis
