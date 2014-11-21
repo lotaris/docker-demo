@@ -1,10 +1,11 @@
 - hosts: localhost
 
   vars:
-    jenkins_uid: 4205
+    jenkins_uid: 4206
     jenkins_user: jenkins
     jenkins_group: jenkins
 
+    glassfish_root: /glassfish4
     jenkins_root: /jenkins
 
     download_directory: /tmp/dl
@@ -15,6 +16,9 @@
 
     - name: Create jenkins user
       user: name={{ jenkins_user }} group={{ jenkins_group }} uid={{ jenkins_uid }} state=present
+
+    - name: Apply the rights to jenkins on glassfish directoryh
+      file: path={{ glassfish_root }} recurse=yes owner={{ jenkins_user }} group={{ jenkins_group }} state=directory
 
     - name: Create download directory in temp file
       file: path={{ download_directory }} state=directory
@@ -56,6 +60,9 @@
     - name: Set the correct rights on the jenkins update center file
       file: path=/var/lib/jenkins/updates/default.json group={{ jenkins_group }} owner={{ jenkins_user }} state=file
 
+    - name: Copy the service configuration
+      template: src=templates/sysconfig-jenkins.j2 dest=/etc/sysconfig/jenkins
+
     - name: Start Jenkins
       service: name=jenkins state=started
 
@@ -68,7 +75,10 @@
     - name: Install jenkins plugins
       command: java -jar {{ download_directory }}/jenkins-cli.jar -s http://localhost:8080 install-plugin {{ item }}
       with_items:
+        - dynamic-axis
         - git
+        - parameterized-trigger
+        - filesystem-list-parameter-plugin
 
     - name: Configure Jenkins
       template: src=templates/{{ item }}.j2 dest=/var/lib/jenkins/{{ item }} group={{ jenkins_group }} owner={{ jenkins_user }}

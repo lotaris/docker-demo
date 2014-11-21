@@ -1,0 +1,15 @@
+- hosts: localhost
+
+  vars:
+    serf_envvar_addr: serf-gf-cluster
+    serf_envvar_port: 7946
+
+  tasks:
+    - name: Install scripts
+      template: src=templates/start-serf.sh.j2 dest=/serfScripts/start-serf.sh mode=755
+
+    - name: Create supervisor data directories
+      file: path=/supervisor state=directory
+
+    - name: Copy the configuration of the supervisor
+      copy: src=files/supervisord-serf.conf dest=/etc/supervisord.d/gf-node.ini

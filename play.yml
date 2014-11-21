@@ -1,0 +1,55 @@
+- hosts: localhost
+
+  tasks:
+    - name: Build images
+      command: docker build -t lotaris/{{ item }} {{ item }}
+      with_items:
+        - bash
+        - serf-srv
+      # - unicorn-rbenv
+      # - redis-data
+      # - redis-srv
+      # - pg-data
+      # - pg-srv
+      # - pg-init
+      # - rox-center
+      # - rox-center-commander
+      # - resque
+      # - nginx
+        - java-serf
+        - glassfish-base
+        - jenkins-base
+        - mysql-data
+        - mysql-srv
+        - mysql-init
+      # - sonarqube-mysql-init
+      # - sonarqube-srv
+        - glassfish-data
+        - glassfish-srv
+        - glassfish-node
+        - jenkins-srv
+
+    - name: Start serf server
+      command: docker run -dP --name serf-gf-cluster lotaris/serf-srv
+
+    - name: Prepare data container for todolist backend
+      command: docker run -v /data --name mysql-data lotaris/mysql-data
+
+    - name: Inialize mysql for todolist backend
+      command: docker run --rm --volumes-from mysql-data lotaris/mysql-init
+
+    - name: Start mysql container for todolist backend
+      command: docker run -dP --volumes-from mysql-data --name mysql-srv lotaris/mysql-srv
+
+    - name: Prepare data container for glassfish and jenkins
+      command: docker run -v /artifacts --name gf-data lotaris/glassfish-data
+
+    - name: Start Glassfish Test container for todolist backend
+      command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --name gf-srv-test lotaris/glassfish-srv
+
+    - name: Start Jenkins container for todolist backend
+      command: docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
+
+    - name: Start Glassfish nodes container for todolist backend
+      command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-{{ item }} --name gf-node-{{ item }} lotaris/glassfish-node
+      with_sequence: count=2

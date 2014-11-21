@@ -1,7 +1,7 @@
 - hosts: localhost
 
   vars:
-    glassfish_uid: 4204
+    glassfish_uid: 4205
     glassfish_user: glassfish
     glassfish_group: glassfish
 
@@ -10,7 +10,7 @@
     glassfish_asadmin: "{{ glassfish_home }}/bin/asadmin"
 
     asadmin_password: adminadmin
-    asadmin_password_file: "{{ glassfish_home }}/bin/PASSWORD_FILE"
+    asadmin_password_file: "{{ glassfish_root }}/bin/PASSWORD_FILE"
 
     backend_demoapp_db_user: todolist
     backend_demoapp_db_pass: todolist
@@ -57,3 +57,15 @@
 
     - name: Apply the rights to glassfish
       file: path={{ glassfish_root }} recurse=yes owner={{ glassfish_user }} group={{ glassfish_group }} state=directory
+
+    - name: Copy the the password file for glassfish
+      template: src=templates/PASSWORD_FILE.j2 dest={{ asadmin_password_file }} group={{ glassfish_group }} owner={{ glassfish_user }}
+
+    - name: Start glassfish
+      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_asadmin }} start-domain domain1"
+
+    - name: Copy the change password script
+      template: src=templates/changePassword.sh.j2 dest={{ glassfish_root }}/changePassword.sh mode=755 owner={{ glassfish_user }} group={{ glassfish_group }}
+
+    - name: Change admin password
+      command: /bin/su {{ glassfish_user }} -c "{{ glassfish_root }}/changePassword.sh"

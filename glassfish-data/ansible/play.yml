@@ -1,0 +1,16 @@
+- hosts: localhost
+
+  vars:
+    jenkins_uid: 4206
+    jenkins_user: jenkins
+    jenkins_group: jenkins
+
+  tasks:
+    - name: Add jenkins group
+      group: name={{ jenkins_group }} state=present
+
+    - name: Create jenkins user
+      user: name={{ jenkins_user }} group={{ jenkins_group }} uid={{ jenkins_uid }} state=present
+
+    - name: Create the directory data
+      file: path=/artifacts owner={{ jenkins_user }} group={{ jenkins_group }} state=directory

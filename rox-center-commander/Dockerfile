@@ -1,4 +1,4 @@
-FROM d6add50ad23c
+FROM lotaris/rox-center
 
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 

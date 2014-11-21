@@ -1,4 +1,4 @@
-FROM a9e6308c53ec
+FROM lotaris/mysql-srv
 
 ADD ansible /ansible
 WORKDIR /ansible

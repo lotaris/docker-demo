@@ -4,10 +4,18 @@
     jenkins_user: jenkins
     jenkins_group: jenkins
 
+    artifacts_directory: /artifacts
     download_directory: /tmp/dl
 
     mysql_user: todolist
     mysql_pass: todolist
+
+    serf_envvar_addr: serf-gf-cluster
+    serf_envvar_port: 7946
+
+    jobs:
+      - deploy-todolist-backend-on-gf-nodes
+      - deploy-todolist-backend
 
   tasks:
     - name: Start Jenkins
@@ -17,7 +25,7 @@
       file: path={{ download_directory }} state=directory
 
     - name: Do a break to let Jenkins to be ready
-      pause: seconds=30
+      pause: seconds=90
 
     - name: Download jenkins client
       command: wget -O {{ download_directory }}/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar
@@ -27,13 +35,11 @@
 
     - name: Copy the jobs
       template: src=templates/{{ item }}.xml.j2 dest={{ download_directory }}/jobs/{{ item }}.xml
-      with_items:
-        - deploy-todo-list-backend
+      with_items: "{{ jobs }}"
 
     - name: Install the jobs
       shell: java -jar {{ download_directory }}/jenkins-cli.jar -s http://localhost:8080 create-job {{ item }} < {{ download_directory }}/jobs/{{ item }}.xml
-      with_items:
-        - deploy-todo-list-backend
+      with_items: "{{ jobs }}"
 
     - name: Create maven user directory
       file: path=/home/{{ jenkins_user }}/.m2 group={{ jenkins_group }} owner={{ jenkins_user }} state=directory
@@ -43,3 +49,21 @@
 
     - name: Clean the download directory
       file: path={{ download_directory }} state=absent
+
+    - name: Create glassfish nodes directory
+      file: path=/glassfishNodes group={{ jenkins_group }} owner={{ jenkins_user }} state=directory
+
+    - name: Install scripts
+      template: src=templates/start-serf.sh.j2 dest=/serfScripts/start-serf.sh mode=755
+
+    - name: Copy serf event handlers
+      copy: src=files/{{ item }}.sh dest=/serfScripts/{{ item }}.sh mode=755
+      with_items:
+        - member-join
+        - member-leave
+
+    - name: Create supervisor data directories
+      file: path=/supervisor state=directory
+
+    - name: Copy the configuration of the supervisor
+      copy: src=files/supervisord-serf.conf dest=/etc/supervisord.d/jenkins.ini

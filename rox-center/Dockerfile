@@ -1,4 +1,4 @@
-FROM b4d424e86e91
+FROM lotaris/unicorn-rbenv
 
 ADD ansible /ansible/
 WORKDIR /ansible

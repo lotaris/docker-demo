@@ -1,4 +1,4 @@
-FROM d5312201c5f9
+FROM lotaris/java
 
 ADD ansible /ansible
 WORKDIR /ansible

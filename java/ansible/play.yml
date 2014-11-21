@@ -1,8 +1,0 @@
-- hosts: localhost
-
-  tasks:
-    - name: Install utilities
-      yum: name=wget state=present
-
-    - name: Install Java
-      yum: name=java-1.7.0-openjdk-devel state=present

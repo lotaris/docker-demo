@@ -17,13 +17,19 @@
       template: src=templates/my.cnf.j2 dest=/etc/my.cnf
 
     - name: Install default database
-      command: mysql_install_db --user={{ mysql_user }} --datadir={{ data_path }}
+      command: mysql_install_db --user={{ mysql_user }} --datadir={{ data_path }}/mysql
 
     - name: Copy configuration file
-      template: src=templates/init.sql.j2 dest=/data/init.sql
+      template: src=templates/init.sql.j2 dest=/data/init.sql group={{ mysql_group }} owner={{ mysql_user }}
 
     - name: Start mysqld to setup the user and database
       service: name=mysqld state=started
+
+    - name: Copy todolist user creation file
+      template: src=templates/todolist.sql.j2 dest=/data/todolist.sql group={{ mysql_group }} owner={{ mysql_user }}
+
+    - name: Execute the todolist user creation
+      shell: mysql -u root -p{{ mysql_root_password }} < /data/todolist.sql
 
     - name: Stop mysqld
       service: name=mysqld state=stopped

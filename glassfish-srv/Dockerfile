@@ -1,12 +1,13 @@
-FROM 63f27e1fc274
+FROM lotaris/glassfish-base
 
 ADD ansible /ansible
 WORKDIR /ansible
 
 RUN ansible-playbook play.yml -c local
 
-EXPOSE 8080
-EXPOSE 4848
+EXPOSE 8080 4848
+
+VOLUME /glassfish4/glassfish/domains/domain1
 
 USER glassfish
 

@@ -1,4 +1,4 @@
-FROM 76c69b9c93c3
+FROM lotaris/pg-srv
 
 ADD ansible /ansible
 WORKDIR /ansible

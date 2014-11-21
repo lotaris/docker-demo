@@ -1,4 +1,4 @@
-FROM 40c1b0004228
+FROM lotaris/rox-center
 
 VOLUME /rox/log
 

@@ -1,15 +1,12 @@
-FROM lotaris/jenkins-base
+FROM ansible/centos7-ansible:stable
 
 ADD ansible /ansible
 WORKDIR /ansible
 
 RUN ansible-playbook play.yml -c local
 
-EXPOSE 8080
+EXPOSE 7946 7373
 
-VOLUME /var/lib/jenkins
-VOLUME /glassfish4
 VOLUME /supervisor
-VOLUME /glassfishNodes
 
 ENTRYPOINT ["/usr/bin/supervisord", "-n"]
