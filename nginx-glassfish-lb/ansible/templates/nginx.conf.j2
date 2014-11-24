@@ -1,0 +1,32 @@
+user {{ nginx_user }};
+
+worker_processes 1;
+
+pid /run/nginx.pid;
+
+error_log  /nginx/error.log;
+
+events {
+  worker_connections 768;
+}
+
+http {
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  keepalive_timeout 65;
+  gzip on;
+  gzip_comp_level 6;
+  gzip_vary on;
+  gzip_min_length 1000;
+  gzip_proxied any;
+  gzip_types text/plain text/css application/json application/x-javascript te$
+  gzip_buffers 16 8k;
+  types_hash_max_size 2048;
+
+  access_log /nginx/nginx-access.log;
+  error_log /nginx/nginx-error.log;
+
+  include /etc/nginx/conf.d/*.conf;
+  include /etc/nginx/sites-enabled/*;
+}

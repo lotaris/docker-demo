@@ -1,0 +1,2 @@
+#!/bin/bash
+exec serf agent -tag role=nginx-gf-lb -join {{ serf_envvar_addr }}:{{ serf_envvar_port }} -event-handler member-join=/serfScripts/member-join.sh -event-handler member-leave,member-failed=/serfScripts/member-leave.sh

@@ -12,4 +12,4 @@
       file: path=/supervisor state=directory
 
     - name: Copy the configuration of the supervisor
-      copy: src=files/supervisord-serf.conf dest=/etc/supervisord.d/gf-node.ini
+      copy: src=files/supervisord.conf dest=/etc/supervisord.d/gf-node.ini

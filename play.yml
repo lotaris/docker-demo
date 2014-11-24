@@ -28,6 +28,10 @@
         - glassfish-srv
         - glassfish-node
         - jenkins-srv
+        - nginx-glassfish-lb
+
+    # - name: Docker cleanup
+    #   shell: "docker rmi $(docker images -f 'dangling=true' -q)"
 
     - name: Start serf server
       command: docker run -dP --name serf-gf-cluster lotaris/serf-srv
@@ -49,6 +53,9 @@
 
     - name: Start Jenkins container for todolist backend
       command: docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
+
+    - name: Start the Glassfish Load balancer
+      command: docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-gf-lb lotaris/nginx-glassfish-lb
 
     - name: Start Glassfish nodes container for todolist backend
       command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-{{ item }} --name gf-node-{{ item }} lotaris/glassfish-node

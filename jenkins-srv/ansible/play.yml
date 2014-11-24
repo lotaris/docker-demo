@@ -14,7 +14,6 @@
     serf_envvar_port: 7946
 
     jobs:
-      - deploy-todolist-backend-on-gf-nodes
       - deploy-todolist-backend
 
   tasks:
@@ -39,7 +38,7 @@
 
     - name: Install the jobs
       shell: java -jar {{ download_directory }}/jenkins-cli.jar -s http://localhost:8080 create-job {{ item }} < {{ download_directory }}/jobs/{{ item }}.xml
-      with_items: "{{ jobs }}"
+      with_items: "{{ jobs }}"
 
     - name: Create maven user directory
       file: path=/home/{{ jenkins_user }}/.m2 group={{ jenkins_group }} owner={{ jenkins_user }} state=directory

@@ -101,9 +101,14 @@
 * jenkins-srv run cmd: `docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv`
 * jenkins-srv bash run cmd: `docker run --rm -ti --volumes-from jenkins-srv lotaris/bash`
 
+# Glassfish Load balancer (through Nginx)
+* nginx-glassfish-lb image ID: `lotaris/nginx-glassfish-lb`
+* nginx-glassfish-lb run cmd: `docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-gf-lb lotaris/nginx-glassfish-lb`
+* nginx-glassfish-lb bash run cmd: `docker run -ti --volumes-from nginx-gf-lb lotaris/bash`
+
 # Glassfish node server
 * glassfish-node image ID: `lotaris/glassfish-node`
 * glassfish-node Node 1 : `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-1 --name gf-node-1 lotaris/glassfish-node`
-* glassfish-node Node 2 : `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-1 --name gf-node-2 lotaris/glassfish-node`
+* glassfish-node Node 2 : `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-2 --name gf-node-2 lotaris/glassfish-node`
 * glassfish-node bash run cmd Node 1: `docker run -ti --volumes-from gf-node-1 lotaris/bash`
 * glassfish-node bash run cmd Node 1: `docker run -ti --volumes-from gf-node-2 lotaris/bash`
