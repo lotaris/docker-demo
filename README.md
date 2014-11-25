@@ -91,11 +91,6 @@
 * gf-data run cmd: `docker run -v /artifacts --name gf-data lotaris/glassfish-data`
 * gf-data bash run cmd: `docker run --rm -ti --volumes-from gf-data lotaris/bash`
 
-# Glassfish test server
-* glassfish-srv image ID: `lotaris/glassfish-srv`
-* glassfish-srv run cmd: `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --name gf-srv-test lotaris/glassfish-srv`
-* glassfish-srv bash run cmd: `docker run -ti --volumes-from gf-srv-test lotaris/bash`
-
 # Jenkins server
 * jenkins-srv images ID: `lotaris/jenkins-srv`
 * jenkins-srv run cmd: `docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv`

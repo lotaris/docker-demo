@@ -25,7 +25,6 @@
       # - sonarqube-mysql-init
       # - sonarqube-srv
         - glassfish-data
-        - glassfish-srv
         - glassfish-node
         - jenkins-srv
         - nginx-glassfish-lb
@@ -48,11 +47,8 @@
     - name: Prepare data container for glassfish and jenkins
       command: docker run -v /artifacts --name gf-data lotaris/glassfish-data
 
-    - name: Start Glassfish Test container for todolist backend
-      command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --name gf-srv-test lotaris/glassfish-srv
-
     - name: Start Jenkins container for todolist backend
-      command: docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
+      command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
 
     - name: Start the Glassfish Load balancer
       command: docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-gf-lb lotaris/nginx-glassfish-lb

@@ -1,6 +1,4 @@
-FROM lotaris/glassfish-srv
-
-USER root
+FROM lotaris/glassfish-base
 
 ADD ansible /ansible
 WORKDIR /ansible

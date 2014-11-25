@@ -6,8 +6,14 @@ while read -a values; do
   if [[ $GFNAME == gf-node-* ]]; then
     GFIP=${values[1]}
 
-    rm -f /glassfishNodes/$GFNAME
+    GFMASTER=`cat /glassfishNodes/gf-master`
 
-    sed -i -c -e "\|^$GFIP $GFNAME\$|d" /etc/hosts
+    if [[ $GFNAME == $GFMASTER ]]; then
+      rm -f /glassfish/gf-master
+      sed -i -c -e "\|^$GFIP gf-master\$|d" /etc/hosts
+    else
+      rm -f /glassfishNodes/$GFNAME
+      sed -i -c -e "\|^$GFIP $GFNAME\$|d" /etc/hosts
+    fi
   fi
 done

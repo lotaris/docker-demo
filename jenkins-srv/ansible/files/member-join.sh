@@ -6,8 +6,14 @@ while read -a values; do
   if [[ $GFNAME == gf-node-* ]]; then
     GFIP=${values[1]}
 
-    touch /glassfishNodes/$GFNAME
+    NB_NODES=`ls /glassfishNodes | wc -l`
 
-    echo "$GFIP $GFNAME" >> /etc/hosts
+    if [[ $NB_NODES -eq 0 ]]; then
+      echo $GFNAME > /glassfishNodes/gf-master
+      echo "$GFIP gf-master" >> /etc/hosts
+    else
+      touch /glassfishNodes/$GFNAME
+      echo "$GFIP $GFNAME" >> /etc/hosts
+    fi
   fi
 done

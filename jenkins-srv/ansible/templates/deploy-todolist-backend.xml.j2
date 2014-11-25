@@ -43,7 +43,7 @@ install
 -ssettings.xml</targets>
       <mavenName>Maven 3</mavenName>
       <pom>pom.xml</pom>
-      <properties>domain.host=gf-srv-test
+      <properties>domain.host=gf-master
 domain.adminPort=4848
 deployConfig.file=/artifacts/${project.build.finalName}.${project.packaging}
 deployConfig.upload=false</properties>
@@ -67,10 +67,11 @@ install
     </hudson.tasks.Maven>
     <hudson.tasks.Shell>
     <command>GFNODES=`ls /glassfishNodes`
-
-      for gfnode in $GFNODES; do
-      /apache-maven-3.0.5/bin/mvn lotaris-glassfish:deploy -e -PbuildSource -PglassfishDeploy -ssettings.xml -Ddomain.host=$gfnode -Ddomain.adminPort=4848 -DdeployConfig.file=&quot;/artifacts/\${project.build.finalName}.\${project.packaging}&quot; -DdeployConfig.upload=false -f todolist-backend-ear/pom.xml
-      done</command>
+for gfnode in $GFNODES; do
+  if [[ $gfnode == gf-node-* ]]; then
+    /apache-maven-3.0.5/bin/mvn lotaris-glassfish:deploy -e -PbuildSource -PglassfishDeploy -ssettings.xml -Ddomain.host=$gfnode -Ddomain.adminPort=4848 -DdeployConfig.file=&quot;/artifacts/\${project.build.finalName}.\${project.packaging}&quot; -DdeployConfig.upload=false -f todolist-backend-ear/pom.xml
+  fi
+done</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
