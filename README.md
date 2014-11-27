@@ -1,3 +1,14 @@
+## Pre-requisites
+
+To run the following demo, you need to install:
+
+- [Ansible](http://www.ansible.com/home), [Installation](http://docs.ansible.com/intro_installation.html#installing-the-control-machine)
+- [Docker](https://www.docker.com/), Installation on [Mac OS](https://docs.docker.com/installation/mac/)
+
+Once installed, you can run the following command:
+
+`ansible-playbook play.yml -c local`
+
 # Important
 > The image IDs are only there as example. They are not usable out of the box.
 
