@@ -28,6 +28,9 @@
         - glassfish-node
         - jenkins-srv
         - nginx-glassfish-lb
+        - nginx-angular-lb
+        - nginx-angular-data
+        - nginx-angular-node
 
     # - name: Docker cleanup
     #   shell: "docker rmi $(docker images -f 'dangling=true' -q)"
@@ -47,12 +50,22 @@
     - name: Prepare data container for glassfish and jenkins
       command: docker run -v /artifacts --name gf-data lotaris/glassfish-data
 
+    - name: Prepare data container for todolist frontend
+      command: docker run -v /frontend --name nginx-angular-data lotaris/nginx-angular-data
+
     - name: Start Jenkins container for todolist backend
-      command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
+      command: docker run -dP --volumes-from gf-data --volumes-from nginx-angular-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv
 
     - name: Start the Glassfish Load balancer
       command: docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-gf-lb lotaris/nginx-glassfish-lb
 
+    - name: Start the Angular Load balancer
+      command: docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-angular-lb lotaris/nginx-angular-lb
+
     - name: Start Glassfish nodes container for todolist backend
       command: docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-{{ item }} --name gf-node-{{ item }} lotaris/glassfish-node
+      with_sequence: count=2
+
+    - name: Start the frontend application containers
+      command: docker run -dP --volumes-from nginx-angular-data --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=nginx-angular-node-{{ item }} --name nginx-angular-node-{{ item }} lotaris/nginx-angular-node
       with_sequence: count=2

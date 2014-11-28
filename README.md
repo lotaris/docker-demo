@@ -102,6 +102,10 @@ Once installed, you can run the following command:
 * gf-data run cmd: `docker run -v /artifacts --name gf-data lotaris/glassfish-data`
 * gf-data bash run cmd: `docker run --rm -ti --volumes-from gf-data lotaris/bash`
 
+# Prepare the data container for the frontend application
+* nginx-angular-data image ID `lotaris/nginx-angular-data`
+* nginx-angular-data run cmd: `docker run -v /frontend --name nginx-angular-data lotaris/nginx-angular-data`
+
 # Jenkins server
 * jenkins-srv images ID: `lotaris/jenkins-srv`
 * jenkins-srv run cmd: `docker run -dP --volumes-from gf-data --link /gf-srv-test:gf-srv-test --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --name jenkins-srv lotaris/jenkins-srv`
@@ -112,9 +116,21 @@ Once installed, you can run the following command:
 * nginx-glassfish-lb run cmd: `docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-gf-lb lotaris/nginx-glassfish-lb`
 * nginx-glassfish-lb bash run cmd: `docker run -ti --volumes-from nginx-gf-lb lotaris/bash`
 
+# Angular load balancer (through Nginx)
+* nginx-angular-lb image ID: `lotaris/nginx-angular-lb`
+* nginx-angular-lb run cmd: `docker run -dP --link /serf-gf-cluster:serf-gf-cluster --name nginx-angular-lb lotaris/nginx-angular-lb`
+* nginx-angular-lb bash run cmd: `docker run -ti --volumes-from nginx-angular-lb lotaris/bash`
+
 # Glassfish node server
 * glassfish-node image ID: `lotaris/glassfish-node`
 * glassfish-node Node 1 : `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-1 --name gf-node-1 lotaris/glassfish-node`
 * glassfish-node Node 2 : `docker run -dP --volumes-from gf-data --link /mysql-srv:mysql-srv --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=gf-node-2 --name gf-node-2 lotaris/glassfish-node`
 * glassfish-node bash run cmd Node 1: `docker run -ti --volumes-from gf-node-1 lotaris/bash`
-* glassfish-node bash run cmd Node 1: `docker run -ti --volumes-from gf-node-2 lotaris/bash`
+* glassfish-node bash run cmd Node 2: `docker run -ti --volumes-from gf-node-2 lotaris/bash`
+
+# Nginx angular node server
+* nginx-angular-node image ID: `lotaris/nginx-angular-node`
+* nginx-angular-node Node 1: `docker run -dP --volumes-from nginx-angular-data --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=nginx-angular-node-1 --name nginx-angular-node-1 lotaris/nginx-angular-node`
+* nginx-angular-node Node 2: `docker run -dP --volumes-from nginx-angular-data --link /serf-gf-cluster:serf-gf-cluster --env NODE_NAME=nginx-angular-node-2 --name nginx-angular-node-2 lotaris/nginx-angular-node`
+* nginx-angular-node bash run cmd Node 1: `docker run -ti --volumes-from nginx-angular-node-1 lotaris/bash`
+* nginx-angular-node bash run cmd Node 2: `docker run -ti --volumes-from nginx-angular-node-2 lotaris/bash`

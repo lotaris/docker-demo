@@ -1,0 +1,75 @@
+- hosts: localhost
+
+  vars:
+    nginx_uid: 4203
+    nginx_user: nginx
+    nginx_group: nginx
+
+    serf_envvar_addr: serf-gf-cluster
+    serf_envvar_port: 7946
+
+    application_path: /
+    application_port: 80
+
+    download_directory: /tmp/dl
+
+  tasks:
+    - name: Add nginx group
+      group: name={{ nginx_group }} state=present
+
+    - name: Create nginx user
+      user: name={{ nginx_user }} group={{ nginx_group }} uid={{ nginx_uid }} state=present
+
+    - name: Install nginx and supervisor
+      yum: name={{ item }} state=present
+      with_items:
+        - wget
+        - unzip
+        - nginx
+        - supervisor
+
+    - name: Create download directory in temp file
+      file: path={{ download_directory }} state=directory
+
+    - name: Download serf
+      command: wget -O {{ download_directory }}/serf.zip https://dl.bintray.com/mitchellh/serf/0.6.3_linux_amd64.zip
+
+    - name: Install serf
+      unarchive: src={{ download_directory }}/serf.zip dest=/usr/bin copy=yes creates=/usr/bin/serf
+
+    - name: Clean the download directory
+      file: path={{ download_directory }} state=absent
+
+    - name: Create serf scripts directory
+      file: path=/serfScripts state=directory
+
+    - name: Install scripts
+      template: src=templates/{{ item }}.j2 dest=/serfScripts/{{ item }} mode=755
+      with_items:
+        - start-serf.sh
+        - member-join.sh
+        - member-leave.sh
+
+    - name: Create supervisor data directories
+      file: path=/supervisor state=directory
+
+    - name: Copy the configuration of the supervisor
+      copy: src=files/supervisord.conf dest=/etc/supervisord.d/serf.ini
+
+    - name: Copy configuration file
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+    - name: Create nginx configuration directory
+      file: path=/etc/nginx/sites-enabled state=directory
+
+    - name: Copy specific configuration file
+      template: src=templates/nginx-default.conf.j2 dest=/etc/nginx/sites-enabled/default
+
+    - name: Create nginx directory
+      file: path=/nginx group={{ nginx_group }} owner={{ nginx_user }} state=directory
+
+    - name: Create default site directory
+      file: path=/nginx/default group={{ nginx_group }} owner={{ nginx_user }} state=directory
+
+    - name: Copy the maintenance page
+      copy: src=files/maintenance.html dest=/nginx/default/maintenance.html group={{ nginx_group }} owner={{ nginx_user }}

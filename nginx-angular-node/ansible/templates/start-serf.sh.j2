@@ -1,0 +1,2 @@
+#!/bin/bash
+exec serf agent -tag role=angular-node -node $NODE_NAME -join {{ serf_envvar_addr }}:{{ serf_envvar_port }}

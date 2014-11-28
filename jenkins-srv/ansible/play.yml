@@ -15,6 +15,7 @@
 
     jobs:
       - deploy-todolist-backend
+      - deploy-todolist-frontend
 
   tasks:
     - name: Start Jenkins
@@ -66,3 +67,9 @@
 
     - name: Copy the configuration of the supervisor
       copy: src=files/supervisord-serf.conf dest=/etc/supervisord.d/jenkins.ini
+
+    - name: Install NPM
+      yum: name=npm state=present
+
+    - name: Install Bower
+      npm: name=bower global=yes production=yes state=present

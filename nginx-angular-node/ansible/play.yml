@@ -1,0 +1,61 @@
+- hosts: localhost
+
+  vars:
+    nginx_uid: 4203
+    nginx_user: nginx
+    nginx_group: nginx
+
+    download_directory: /tmp/dl
+
+    serf_envvar_addr: serf-gf-cluster
+    serf_envvar_port: 7946
+
+    application_path: /frontend
+
+  tasks:
+    - name: Add nginx group
+      group: name={{ nginx_group }} state=present
+
+    - name: Create nginx user
+      user: name={{ nginx_user }} group={{ nginx_group }} uid={{ nginx_uid }} state=present
+
+    - name: Install Dependencies
+      yum: name={{ item }} state=present
+      with_items:
+        - unzip
+        - wget
+        - nginx
+        - supervisor
+
+    - name: Create download directory in temp file
+      file: path={{ download_directory }} state=directory
+
+    - name: Download serf
+      command: wget -O {{ download_directory }}/serf.zip https://dl.bintray.com/mitchellh/serf/0.6.3_linux_amd64.zip
+
+    - name: Install serf
+      unarchive: src={{ download_directory }}/serf.zip dest=/usr/bin copy=yes creates=/usr/bin/serf
+
+    - name: Clean the download directory
+      file: path={{ download_directory }} state=absent
+
+    - name: Create serf scripts directory
+      file: path=/serfScripts state=directory
+
+    - name: Create supervisor data directories
+      file: path=/supervisor state=directory
+
+    - name: Create the supervisor configuration directory
+      file: path=/etc/supervisor/conf.d recurse=yes state=directory
+
+    - name: Copy configuration file
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+    - name: Install scripts
+      template: src=templates/start-serf.sh.j2 dest=/serfScripts/start-serf.sh mode=755
+
+    - name: Create supervisor data directories
+      file: path=/supervisor state=directory
+
+    - name: Copy the configuration of the supervisor
+      copy: src=files/supervisord.conf dest=/etc/supervisord.d/angular-node.ini

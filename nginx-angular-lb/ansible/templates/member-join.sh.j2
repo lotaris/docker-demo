@@ -1,0 +1,21 @@
+#!/bin/bash
+
+while read -a values; do
+  NODENAME=${values[0]}
+
+  if [[ $NODENAME == nginx-angular-node-* ]]; then
+    NODEIP=${values[1]}
+
+    SERVER_STRING="server ${NODEIP}:{{ application_port }};"
+
+    sed -i "/upstream/a\  $SERVER_STRING" /etc/nginx/sites-enabled/default
+    echo $SERVER_STRING >> /nginx/servers
+
+    NB_SERVERS=`wc -l < /nginx/servers`
+    if [[ $NB_SERVERS -eq 1 ]]; then
+      sed -i "s/server 127.0.0.1:81;/server 127.0.0.1:81 backup;/" /etc/nginx/sites-enabled/default
+    fi
+
+    nginx -s reload
+  fi
+done
